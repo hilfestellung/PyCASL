@@ -1,0 +1,7 @@
+include LICENSE CHANGES README.md requirements.txt
+exclude tests
+recursive-exclude * __pycache__
+recursive-exclude * *.pyc
+recursive-exclude * *.pyo
+recursive-exclude * *.orig
+recursive-exclude * test_*.py
