@@ -9,7 +9,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name='PyCASL',
-    version='1.0.0',
+    version='1.0.1',
     packages=['casl'],
     package_dir={'': 'src'},
     long_description=README,
@@ -23,5 +23,6 @@ setup(
         "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.9",
-    ]
+    ],
+    extra_require=dict(tests=['pytest'])
 )

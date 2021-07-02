@@ -11,7 +11,7 @@ class RawRule(object):
         self.inverted = inverted
         self.reason = reason
 
-    def valid(self, subject):
+    def valid(self, subject, *args, **kwargs):
         if isinstance(subject, str):
             if subject != self.subject:
                 return self.inverted
@@ -23,7 +23,7 @@ class RawRule(object):
                 return self.inverted
         if self.fields and not _matches(self.fields, subject):
             return self.inverted
-        if self.conditions and not _evaluate_conditions(self.conditions, subject):
+        if self.conditions and not _evaluate_conditions(self.conditions, subject, *args, **kwargs):
             return self.inverted
         return not self.inverted
 
@@ -46,9 +46,9 @@ def _matches(fields: dict, subject):
     return True
 
 
-def _evaluate_conditions(conditions: list, subject):
+def _evaluate_conditions(conditions: list, subject, *args, **kwargs):
     for condition in conditions:
-        if not inspect.isfunction(condition) or not condition(subject):
+        if not inspect.isfunction(condition) or not condition(subject, *args, **kwargs):
             return False
     return True
 
@@ -61,10 +61,10 @@ def _maintain_multi_value(container, rule):
     rules.append(rule)
 
 
-def _evaluate_rules(rules: Iterator[RawRule], subject):
+def _evaluate_rules(rules: Iterator[RawRule], subject, *args, **kwargs):
     if rules:
         for rule in rules:
-            if rule.valid(subject):
+            if rule.valid(subject, *args, **kwargs):
                 return True
     return False
 
@@ -73,13 +73,13 @@ class Ability(object):
     def __init__(self, rules):
         self.__rules = rules
 
-    def can(self, action: str, subject):
+    def can(self, action: str, subject, *args, **kwargs):
         rules = filter(lambda r: r.action == action, self.__rules)
-        return _evaluate_rules(rules, subject)
+        return _evaluate_rules(rules, subject, *args, **kwargs)
 
-    def cannot(self, action: str, subject):
+    def cannot(self, action: str, subject, *args, **kwargs):
         rules = filter(lambda r: r.action == action, self.__rules)
-        return not _evaluate_rules(rules, subject)
+        return not _evaluate_rules(rules, subject, *args, **kwargs)
 
 
 class AbilityBuilder(object):
@@ -129,7 +129,6 @@ def define_ability(builder):
     else:
         builder(ability_builder.can, ability_builder.cannot)
     return ability_builder.build()
-
 
 # class FlaskAbility(object):
 #     def __init__(self, app):
